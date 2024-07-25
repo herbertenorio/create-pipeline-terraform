@@ -38,7 +38,7 @@ jobs:
           --method POST \
           -H "Accept: application/vnd.github+json" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/TEMPLATE_OWNER/TEMPLATE_REPO/generate \
+          /repos/$TEMPLATE_OWNER/$TEMPLATE_REPO/generate \
           -f "owner=octocat" -f "name=Hello-World" -f "description=This is your first repository" -F "include_all_branches=false" -F "private=false")
           
           echo $response
