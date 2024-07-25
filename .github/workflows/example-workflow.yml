@@ -1,0 +1,59 @@
+name: Create Repository from Template
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo-name:
+        description: 'Nome da pipeline
+        required: true
+        default: ''
+
+jobs:
+  create-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Create new repository from template
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_REPO_NAME: ${{ github.event.inputs.repo-name }}
+          TEMPLATE_OWNER: 'herbertenorio'
+          TEMPLATE_REPO: 'terraform-pipeline-template'
+        run: |
+          response=$(curl -s -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.baptiste-preview+json" \
+            https://api.github.com/repos/$TEMPLATE_OWNER/$TEMPLATE_REPO/generate \
+            -d "{\"owner\":\"${{ github.repository_owner }}\",\"name\":\"${NEW_REPO_NAME}\"}")
+          
+          echo $response
+
+          # Extraindo a URL do novo repositório
+          new_repo_url=$(echo $response | jq -r .html_url)
+          echo "New repository URL: $new_repo_url"
+
+      - name: Configure branch protection
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_REPO_NAME: ${{ github.event.inputs.repo-name }}
+        run: |
+          curl -X PUT \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.luke-cage-preview+json" \
+            https://api.github.com/repos/${{ github.repository_owner }}/${NEW_REPO_NAME}/branches/main/protection \
+            -d '{
+              "required_status_checks": null,
+              "enforce_admins": true,
+              "required_pull_request_reviews": {
+                "dismiss_stale_reviews": true,
+                "require_code_owner_reviews": false,
+                "required_approving_review_count": 1
+              },
+              "restrictions": null
+            }'
