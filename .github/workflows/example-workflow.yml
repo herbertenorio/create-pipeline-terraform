@@ -36,7 +36,7 @@ jobs:
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer $GITHUB_TOKEN" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/$TEMPLATE_OWNER/$TEMPLATE_REPO/generate \
+          https://api.github.com/repos/$TEMPLATE_OWNER/$TEMPLATE_REPO/generate \
           -f "owner=$TEMPLATE_OWNER" -f "name=$NEW_REPO_NAME" -f "description=Pipeline $NEW_REPO_NAME" -F "include_all_branches=false" -F "private=false" -F "visibility=public" -F "accept=application/vnd.github.baptiste-preview+json"
 
       - name: Configure branch protection
