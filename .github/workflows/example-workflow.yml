@@ -26,7 +26,7 @@ jobs:
 
       - name: Create new repository from template
         env:
-          #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           NEW_REPO_NAME: ${{ github.event.inputs.repo-name }}
           TEMPLATE_OWNER: "herbertenorio"
           TEMPLATE_REPO: "terraform-pipeline-template"
@@ -41,13 +41,13 @@ jobs:
 
       - name: Configure branch protection
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           NEW_REPO_NAME: ${{ github.event.inputs.repo-name }}
         run: |
           curl -X PUT \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.luke-cage-preview+json" \
-            https://api.github.com/repos/${{ github.repository_owner }}/${NEW_REPO_NAME}/branches/main/protection \
+            https://api.github.com/repos/$TEMPLATE_OWNER/$NEW_REPO_NAME/branches/main/protection \
             -d '{
               "required_status_checks": null,
               "enforce_admins": true,
